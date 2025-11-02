@@ -1,5 +1,4 @@
 #!/bin/bash
-
 ## Install script for the AD image:
 
 # Setup dest. Dir(s)
@@ -19,11 +18,19 @@ function install_pipx_uv() {
     source ~/.bashrc # makes uv available immediately!
 }
 
+# env:
+function set_bin_path() {
+    echo "[INFO] Adding /opt/tools/bin to PATH"
+    export PATH="/opt/tools/bin:$PATH"
+}
+
+# Tools:
 function install_asrepcatcher() {
     echo "[INFO] Installing Asrepcatcher: "
     uv tool install git+https://github.com/Yaxxine7/ASRepCatcher
 }
 
+# BUG: doesn't work!
 function install_responder() {
     echo "[INFO] Installing Responder: "
     git -C /opt/tools/ clone --depth 1 https://github.com/lgandx/Responder
@@ -47,7 +54,7 @@ function install_responder() {
 
 function install_sprayhound() {
     echo "[INFO] Installing Sprayhound: "
-    uv tooll install git+https://github.com/Hackndo/sprayhound
+    uv tool install --with setuptools==80 git+https://github.com/Hackndo/sprayhound
 }
 
 function install_smartbrute() {
@@ -146,7 +153,7 @@ function install_powershell() {
    ln -v -s /opt/tools/powershell/7/pwsh /opt/tools/bin/powershell
 }
 
-
+# BUG: the stinky setuptools error
 function install_krbrelayx() {
     echo "[INFO] Installing Kerbrelayx: "
     git -C /opt/tools/ clone --depth 1 https://github.com/dirkjanm/krbrelayx
@@ -229,8 +236,6 @@ function install_smbmap() {
     uv tool install .
 }
 
-
-
 function install_pth-tools() {
     echo "[INFO] Installing PTH-tools: "
     git -C /opt/tools clone --depth 1 https://github.com/byt3bl33d3r/pth-toolkit
@@ -265,7 +270,7 @@ function install_ntlmv1-multi() {
 
 function install_adidnsdump() {
     echo "[INFO] Installing AD-DNSdump: "
-    uv tool git+https://github.com/dirkjanm/adidnsdump
+    uv tool install git+https://github.com/dirkjanm/adidnsdump
 }
 
 function install_pygpoabuse() {
@@ -353,7 +358,7 @@ function install_pywhisker() {
     uv tool install --with setuptools==80 git+https://github.com/ShutdownRepo/pywhisker
 }
 
-
+# BUG: ImportError: failed to find libmagic.
 function install_manspider() {
     echo "[INFO] Installing Manspider: "
     uv tool install --with setuptools==80 git+https://github.com/blacklanternsecurity/MANSPIDER
@@ -379,7 +384,7 @@ function install_pcredz() {
     deactivate
 }
 
-
+# BUG: gcc error
 function install_pywsus() {
     echo "[INFO] Installing PyWSUS: "
     git -C /opt/tools/ clone --depth 1 https://github.com/GoSecure/pywsus
@@ -393,13 +398,12 @@ function install_pywsus() {
 
 function install_donpapi() {
     echo "[INFO] Installing DonPAPI: "
-    uv tool git+https://github.com/login-securite/DonPAPI
+    uv tool install git+https://github.com/login-securite/DonPAPI
 }
 
 function install_webclientservicescanner() {
     echo "[INFO] Installing Webclientservicescanner: "
     uv tool install git+https://github.com/Hackndo/WebclientServiceScanner
-    add-history webclientservicescanner
 }
 
 function install_certipy() {
@@ -481,6 +485,7 @@ function install_certsync() {
     uv tool install git+https://github.com/zblurx/certsync
 }
 
+# BUG: ImportError: failed to find libmagic.
 function install_keepwn() {
     echo "[INFO] Installing Keepwn: "
     uv tool install git+https://github.com/Orange-Cyberdefense/KeePwn
@@ -493,7 +498,7 @@ function install_pre2k() {
 
 function install_msprobe() {
     echo "[INFO] Installing MSProbe: "
-    uv tool install git+https://github.com/puzzlepeaches/msprobe
+    uv tool install --with setuptools==80 git+https://github.com/puzzlepeaches/msprobe
 }
 
 function install_masky() {
@@ -516,6 +521,7 @@ function install_PassTheCert() {
     deactivate
 }
 
+# BUG: ModuleNotFoundError: No module named 'pkg_resources'
 function install_noPac() {
     echo "[INFO] Installing noPac: "
     git -C /opt/tools/ clone --depth 1 https://github.com/Ridter/noPac
@@ -533,7 +539,7 @@ function install_roadrecon() {
 
 function install_roadtx() {
     echo "[INFO] Installing Roadtx: "
-    uv tool install roadtx
+    uv tool install --with setuptools==80 roadtx
 }
 
 function install_teamsphisher() {
@@ -572,17 +578,11 @@ function install_pywerview() {
     uv tool install git+https://github.com/the-useless-one/pywerview
 }
 
-
-function install_scrtdnsdump() {
-    echo "[INFO] Installing Scrtdnsdump: "
-    uv tool install git+https://github.com/scrt/scrtdnsdump
-}
-
 function install_ntlm_theft() {
     echo "[INFO] Installing NTLM-Theft: "
     git -C /opt/tools/ clone --depth 1 https://github.com/Greenwolf/ntlm_theft
     cd /opt/tools/ntlm_theft || exit
-    uv venv ./vemv
+    uv venv ./venv
     source ./venv/bin/activate
     uv pip install xlsxwriter
     deactivate
@@ -639,6 +639,7 @@ function install_sccmsecrets() {
     deactivate
 }
 
+# BUG: does the tool even work?
 function install_sccmwtf() {
     echo "[INFO] Installing SCCMH-wtf: "
     git -C /opt/tools/ clone --depth 1 https://github.com/xpn/sccmwtf
@@ -702,38 +703,29 @@ function install_pysnaffler(){
 }
 
 function install_evil-winrm-py() {
-    echo "[INFO] Installing PySnaffler: "
+    echo "[INFO] Installing evil-winrm-py: "
     uv tool install 'evil-winrm-py[kerberos]@git+https://github.com/adityatelange/evil-winrm-py'
 }
 
 
-
-
-
-
-
-
-
 function main() {
-    set_env
+    setup_dirs
+    set_bin_path
     local start_time
     local end_time
     start_time=$(date +%s)
+    install_pipx_uv                 # Install both pipx and UV
     install_asrepcatcher            # Active Directory ASREP roasting tool that catches ASREP for users in the same VLAN whether they require pre-authentication or not
-    install_pretender
     install_responder               # LLMNR, NBT-NS and MDNS poisoner
     install_ldapdomaindump
     install_sprayhound              # Password spraying tool
     install_smartbrute              # Password spraying tool
     install_bloodhound-py           # ingestor for legacy BloodHound
     install_bloodhound-ce-py        # ingestor for legacy BloodHound
-    install_bloodhound
     install_cypheroth               # Bloodhound dependency
-    # install_mitm6_sources         # Install mitm6 from sources
     install_mitm6_pip               # DNS server misconfiguration exploiter
     install_aclpwn                  # ACL exploiter
     install_impacket                # Network protocols scripts
-    install_pykek                   # AD vulnerability exploiter
     install_lsassy                  # Credentials extracter
     install_privexchange            # Exchange exploiter
     install_ruler                   # Exchange exploiter
@@ -748,7 +740,6 @@ function main() {
     install_enum4linux-ng           # Hosts enumeration
     install_zerologon               # Exploit for zerologon cve-2020-1472
     install_libmspack               # Library for some loosely related Microsoft compression format
-    install_windapsearch-go         # Active Directory Domain enumeration through LDAP queries
     install_oaburl                  # Send request to the MS Exchange Autodiscover service
     install_lnkup
     install_polenum
@@ -758,7 +749,6 @@ function main() {
     install_gpp-decrypt             # Decrypt a given GPP encrypted string
     install_ntlmv1-multi            # NTLMv1 multi tools: modifies NTLMv1/NTLMv1-ESS/MSCHAPv2
     install_hashonymize             # Anonymize NTDS, ASREProast, Kerberoast hashes for remote cracking
-    install_gosecretsdump           # secretsdump in Go for heavy files
     install_adidnsdump              # enumerate DNS records in Domain or Forest DNS zones
     install_pygpoabuse
     install_bloodhound-import
@@ -782,10 +772,14 @@ function main() {
     install_ldaprelayscan
     install_goldencopy
     install_crackhound
-    install_kerbrute                # Tool to enumerate and bruteforce AD accounts through kerberos pre-authentication
     install_ldeep
-    install_rusthound
-    install_rusthound-ce
+    # TODO: install_rusthound
+    # TODO: install_godap                  # A complete terminal user interface (TUI) for LDAP
+    # TODO:install_goexec                 # Go version of *exec (smb,dcom...) from impacket with stronger OPSEC
+    # TODO: install_kerbrute                # Tool to enumerate and bruteforce AD accounts through kerberos pre-authentication
+    # TODO: install_gosecretsdump           # secretsdump in Go for heavy files
+    # TODO: install_windapsearch-go         # Active Directory Domain enumeration through LDAP queries
+    # TODO: install_rusthound-ce
     install_certsync
     install_keepwn
     install_pre2k
@@ -794,7 +788,6 @@ function main() {
     install_roastinthemiddle
     install_PassTheCert
     install_bqm                    # Deduplicate custom BloudHound queries from different datasets and merge them in one customqueries.json file.
-    install_neo4j                  # Bloodhound dependency
     install_noPac
     install_roadrecon              # Rogue Office 365 and Azure (active) Directory tools
     install_roadtx                 # ROADtools Token eXchange
@@ -803,8 +796,6 @@ function main() {
     install_netexec                # Crackmapexec repo
     install_extractbitlockerkeys   # Extract Bitlocker recovery keys from all the computers of the domain
     install_pywerview
-    install_freeipscanner
-    # install_scrtdnsdump          # This tool is a fork of adidnsdump (https://github.com/dirkjanm/adidnsdump). We are currently waiting to see if a PR will be made.
     install_bloodhound-ce          # AD (Community Edition) security tool for reconnaissance and attacking AD environments
     install_ntlm_theft
     install_abuseACL
@@ -819,17 +810,16 @@ function main() {
     install_smbclientng
     install_conpass                # Python tool for continuous password spraying taking into account the password policy.
     install_adminer
-    install_goexec                 # Go version of *exec (smb,dcom...) from impacket with stronger OPSEC
     install_remotemonologue        # A tool to coerce NTLM authentications via DCOM
-    install_godap                  # A complete terminal user interface (TUI) for LDAP
     install_powerview              # Powerview Python implementation 
     install_pysnaffler             # Snaffler, but in Python
     install_evil-winrm-py          # Evil-Winrm, but in Python
+    install_adidnsdump
     post_install
     
     end_time=$(date +%s)
     local elapsed_time=$((end_time - start_time))
-    colorecho "Package ad completed in $elapsed_time seconds."
+    echo "[INFO] Installation completed in $elapsed_time seconds."
 }
 
 
