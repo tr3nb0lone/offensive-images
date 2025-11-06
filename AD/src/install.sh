@@ -6,8 +6,7 @@ function setup_dirs() {
 	mkdir -p /opt/tools/ /opt/tools/bin/
 }
 
-# TODO:
-# prereqs: Go, rust, pipx, uv, 
+# INFO: Installs 78% of the tools!
 function install_pipx_uv() {
     echo "[INFO] Installing Pipx: "
     pip3 install pipx --break-system-packages
@@ -19,9 +18,32 @@ function install_pipx_uv() {
 }
 
 # env:
-function set_bin_path() {
-    echo "[INFO] Adding /opt/tools/bin to PATH"
-    export PATH="/opt/tools/bin:$PATH"
+function setup_bin_misc_shell_path() {
+    echo "[INFO] Installing Oh-My-Zsh with necessary plugins: "
+    # splitting wget and sh
+    wget -O /tmp/ohmyzsh.sh https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+    sh /tmp/ohmyzsh.sh
+    git -C ~/.oh-my-zsh/custom/plugins/ clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions
+    git -C ~/.oh-my-zsh/custom/plugins/ clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting
+    git -C ~/.oh-my-zsh/custom/plugins/ clone --depth 1 https://github.com/zsh-users/zsh-completions
+
+    
+}
+
+# TODO: Languages: Go-Ruby-Rust-PowerShell  - 
+
+function install_powershell() {
+    echo "[INFO] Installing Powershell: "
+    curl -L -o /tmp/powershell.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.3.4/powershell-7.3.4-linux-x64.tar.gz
+
+   # where to put powershell?
+   mkdir -v -p /opt/tools/powershell/7
+   tar xvfz /tmp/powershell.tar.gz -C /opt/tools/powershell/7
+   chmod -v +x /opt/tools/powershell/7/pwsh
+   rm -v /tmp/powershell.tar.gz
+
+   ln -v -s /opt/tools/powershell/7/pwsh /opt/tools/bin/pwsh
+   ln -v -s /opt/tools/powershell/7/pwsh /opt/tools/bin/powershell
 }
 
 # Tools:
@@ -30,7 +52,6 @@ function install_asrepcatcher() {
     uv tool install git+https://github.com/Yaxxine7/ASRepCatcher
 }
 
-# BUG: doesn't work!
 function install_responder() {
     echo "[INFO] Installing Responder: "
     git -C /opt/tools/ clone --depth 1 https://github.com/lgandx/Responder
@@ -39,7 +60,7 @@ function install_responder() {
     source ./venv/bin/activate
     pip3 install -r requirements.txt
     # following requirements needed by MultiRelay.py
-    uv pip install pycryptodomex six
+    uv pip install pycryptodomex six netifaces aioquic
     deactivate
     sed -i 's/ Random/ 1122334455667788/g' /opt/tools/Responder/Responder.conf
     sed -i 's/files\/AccessDenied.html/\/opt\/tools\/Responder\/files\/AccessDenied.html/g' /opt/tools/Responder/Responder.conf
@@ -138,31 +159,16 @@ function install_darkarmour() {
     git -C /opt/tools/ clone --depth 1 https://github.com/bats3c/darkarmour
 }
 
-
-function install_powershell() {
-    echo "[INFO] Installing Powershell: "
-    curl -L -o /tmp/powershell.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.3.4/powershell-7.3.4-linux-x64.tar.gz
-
-   # where to put powershell?
-   mkdir -v -p /opt/tools/powershell/7
-   tar xvfz /tmp/powershell.tar.gz -C /opt/tools/powershell/7
-   chmod -v +x /opt/tools/powershell/7/pwsh
-   rm -v /tmp/powershell.tar.gz
-
-   ln -v -s /opt/tools/powershell/7/pwsh /opt/tools/bin/pwsh
-   ln -v -s /opt/tools/powershell/7/pwsh /opt/tools/bin/powershell
-}
-
-# BUG: the stinky setuptools error
 function install_krbrelayx() {
     echo "[INFO] Installing Kerbrelayx: "
     git -C /opt/tools/ clone --depth 1 https://github.com/dirkjanm/krbrelayx
     cd /opt/tools/krbrelayx || exit
     uv venv ./venv
     source ./venv/bin/activate
-    uv pip install dnspython ldap3 impacket dsinternals
+    uv pip install dnspython ldap3 impacket dsinternals 'setuptools==80.0.0'
     deactivate
-    cp -v /root/sources/assets/grc/conf.krbrelayx /usr/share/grc/conf.krbrelayx
+    # get your own config, man.
+    # cp -v /root/sources/assets/grc/conf.krbrelayx /usr/share/grc/conf.krbrelayx
 }
 
 function install_pypykatz() {
@@ -358,10 +364,9 @@ function install_pywhisker() {
     uv tool install --with setuptools==80 git+https://github.com/ShutdownRepo/pywhisker
 }
 
-# BUG: ImportError: failed to find libmagic.
 function install_manspider() {
     echo "[INFO] Installing Manspider: "
-    uv tool install --with setuptools==80 git+https://github.com/blacklanternsecurity/MANSPIDER
+    uv tool install --with libmagic git+https://github.com/blacklanternsecurity/MANSPIDER
 }
 
 
@@ -384,16 +389,18 @@ function install_pcredz() {
     deactivate
 }
 
-# BUG: gcc error
 function install_pywsus() {
     echo "[INFO] Installing PyWSUS: "
     git -C /opt/tools/ clone --depth 1 https://github.com/GoSecure/pywsus
     cd /opt/tools/pywsus || exit
+    uv venv ./venv
+    source venv/bin/activate
 
-    # https://github.com/GoSecure/pywsus/pull/12
+    # INFO: https://github.com/GoSecure/pywsus/pull/12
     echo -e "beautifulsoup4==4.9.1\nlxml==4.9.1\nsoupsieve==2.0.1" > requirements.txt
-    uv add --script pywsus.py -r requirements.txt
-    # run with uv run /path/pywsus.py
+    STATIC_DEPS=true uv pip install --requirements requirements.txt
+    uv pip install setuptools==80
+    deactivate
 }
 
 function install_donpapi() {
@@ -485,10 +492,9 @@ function install_certsync() {
     uv tool install git+https://github.com/zblurx/certsync
 }
 
-# BUG: ImportError: failed to find libmagic.
 function install_keepwn() {
     echo "[INFO] Installing Keepwn: "
-    uv tool install git+https://github.com/Orange-Cyberdefense/KeePwn
+    uv tool install --with libmagic git+https://github.com/Orange-Cyberdefense/KeePwn
 }
 
 function install_pre2k() {
@@ -521,7 +527,6 @@ function install_PassTheCert() {
     deactivate
 }
 
-# BUG: ModuleNotFoundError: No module named 'pkg_resources'
 function install_noPac() {
     echo "[INFO] Installing noPac: "
     git -C /opt/tools/ clone --depth 1 https://github.com/Ridter/noPac
@@ -529,6 +534,7 @@ function install_noPac() {
     uv venv ./venv
     source ./venv/bin/activate
     uv pip install --requirements requirements.txt
+    uv pip install 'setuptools==80.0.0'
     deactivate
 }
 
@@ -560,7 +566,7 @@ function install_GPOddity() {
 function install_netexec() {
     echo "[INFO] Installing NetExec: "
     uv tool install -p 3.11 --with setuptools==80 git+https://github.com/Pennyw0rth/NetExec
-    register-python-argcomplete nxc >> ~/.zshrc
+    register-python-argcomplete nxc >> ~/.bashrc
 }
 
 function install_extractbitlockerkeys() {
@@ -707,10 +713,18 @@ function install_evil-winrm-py() {
     uv tool install 'evil-winrm-py[kerberos]@git+https://github.com/adityatelange/evil-winrm-py'
 }
 
+# post-install:
+function post_install() {
+    echo "[INFO] Adding /opt/tools/bin to PATH"
+    # this could be stupid, but IDC!
+    echo -e "export PATH=\"/opt/tools/bin:\$PATH\"\n" >> ~/.bashrc
+    echo -e "source ~/.bashrc\n" >> ~/.zshrc
+
+}
 
 function main() {
     setup_dirs
-    set_bin_path
+    setup_bin_misc_shell_path
     local start_time
     local end_time
     start_time=$(date +%s)
@@ -722,15 +736,13 @@ function main() {
     install_smartbrute              # Password spraying tool
     install_bloodhound-py           # ingestor for legacy BloodHound
     install_bloodhound-ce-py        # ingestor for legacy BloodHound
-    install_cypheroth               # Bloodhound dependency
-    install_mitm6_pip               # DNS server misconfiguration exploiter
+    install_mitm6                   # DNS server misconfiguration exploiter
     install_aclpwn                  # ACL exploiter
     install_impacket                # Network protocols scripts
     install_lsassy                  # Credentials extracter
     install_privexchange            # Exchange exploiter
     install_ruler                   # Exchange exploiter
     install_darkarmour              # Windows AV evasion
-    install_amber                   # AV evasion
     install_powershell              # Windows Powershell for Linux
     install_krbrelayx               # Kerberos unconstrained delegation abuse toolkit
     install_evilwinrm               # WinRM shell
@@ -774,6 +786,8 @@ function main() {
     install_crackhound
     install_ldeep
     # TODO: install_rusthound
+    # TODO: install_rustscan
+    # TODO: install_rusthound_ce           # BH-CE collector
     # TODO: install_godap                  # A complete terminal user interface (TUI) for LDAP
     # TODO:install_goexec                 # Go version of *exec (smb,dcom...) from impacket with stronger OPSEC
     # TODO: install_kerbrute                # Tool to enumerate and bruteforce AD accounts through kerberos pre-authentication
@@ -796,12 +810,11 @@ function main() {
     install_netexec                # Crackmapexec repo
     install_extractbitlockerkeys   # Extract Bitlocker recovery keys from all the computers of the domain
     install_pywerview
-    install_bloodhound-ce          # AD (Community Edition) security tool for reconnaissance and attacking AD environments
     install_ntlm_theft
     install_abuseACL
     install_bloodyAD               # Active Directory privilege escalation swiss army knife.
     install_autobloody             # Automatically exploit Active Directory privilege escalation paths.
-    install_dploot                 # Python rewrite of SharpDPAPI written un C#.
+    install_dploot                 # Python rewrite of SharpDPAPI written in C#.
     install_PXEThief
     install_sccmhunter             # SCCMHunter is a post-ex tool built to streamline identifying, profiling, and attacking SCCM related assets in an Active Directory domain.
     install_sccmsecrets
@@ -819,7 +832,7 @@ function main() {
     
     end_time=$(date +%s)
     local elapsed_time=$((end_time - start_time))
-    echo "[INFO] Installation completed in $elapsed_time seconds."
+    echo "[INFO] Installation completed in $elapsed_time seconds." >> /root/.time_wasted
 }
 
 
