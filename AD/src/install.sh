@@ -26,11 +26,52 @@ function setup_bin_misc_shell_path() {
     git -C ~/.oh-my-zsh/custom/plugins/ clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions
     git -C ~/.oh-my-zsh/custom/plugins/ clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting
     git -C ~/.oh-my-zsh/custom/plugins/ clone --depth 1 https://github.com/zsh-users/zsh-completions
-
-    
 }
 
-# TODO: Languages: Go-Ruby-Rust-PowerShell  - 
+# TODO: Languages: Go-Rust-PowerShell
+# FEAT: asdf - one tool to rule them all 
+function install_asdf() {
+    echo "[INFO] Installing asdf: "
+    local URL
+    URL=$(curl --location --silent "https://api.github.com/repos/asdf-vm/asdf/releases/latest" | grep 'browser_download_url.*asdf.*linux-amd64.tar.gz"' | grep -o 'https://[^"]*')
+    curl --location -o /tmp/asdf.tar.gz "$URL"
+    tar -xf /tmp/asdf.tar.gz --directory /tmp
+    rm /tmp/asdf.tar.gz
+    mv /tmp/asdf /opt/tools/bin/asdf
+
+    # temporarily alter PATH(s):
+    export PATH="/opt/tools/bin:$PATH"
+    export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+
+    # asdf completions
+    mkdir -p "${ASDF_DATA_DIR:-$HOME/.asdf}/completions"
+    asdf completion zsh > "${ASDF_DATA_DIR:-$HOME/.asdf}/completions/_asdf"
+}
+
+function install_go() {
+    echo "[INFO] Installing go (Golang): "
+    asdf plugin add golang https://github.com/asdf-community/asdf-golang.git
+
+    # Various go versions:
+    # 1.24.1 needed for GoExec
+    asdf install golang 1.24.1
+    # 1.23 needed sensepost/ruler
+    asdf install golang 1.23.0
+    # Default GO version: 1.24.4
+    asdf install golang 1.24.4
+    asdf set --home golang 1.24.4
+}
+
+function install_rust_cargo() {
+    echo "[INFO] Installing rustc, cargo, rustup: "
+    # splitting curl | sh
+    curl https://sh.rustup.rs -sSf -o /tmp/rustup.sh
+    sh /tmp/rustup.sh -y
+    source "$HOME/.cargo/env"
+    # Fast rust crate installation helper
+    curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh -o /tmp/install-from-binstall-release.sh
+    sh /tmp/install-from-binstall-release.sh
+}
 
 function install_powershell() {
     echo "[INFO] Installing Powershell: "
@@ -47,6 +88,85 @@ function install_powershell() {
 }
 
 # Tools:
+function install_rusthound() {
+    echo "[INFO] Installing RustHound: "
+    source "$HOME/.cargo/env"
+    cargo install rusthound
+}
+
+function install_rustscan() {
+    echo "[INFO] Installing RustHound: "
+    source "$HOME/.cargo/env"
+    cargo binstall -y rustscan
+}
+
+function install_rusthound_ce() {
+    echo "[INFO] Installing RustHound-CE: "
+    source "$HOME/.cargo/env"
+    cargo install rusthound-ce
+}
+
+function install_goexec() {
+    # temporarily alter PATH(s):
+    export PATH="/opt/tools/bin:$PATH"
+    export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+    
+    echo "[INFO] Installing GoExec: "
+    mkdir -p /opt/tools/goexec || exit
+    cd /opt/tools/goexec || exit
+    asdf set golang 1.24.1
+    mkdir -p .go/bin
+    GOBIN=/opt/tools/goexec/.go/bin CGO_ENABLED=0 go install -ldflags='-s -w' -v github.com/FalconOpsLLC/goexec@latest
+    asdf reshim golang
+}
+
+function install_godap() {
+    # temporarily alter PATH(s):
+    export PATH="/opt/tools/bin:$PATH"
+    export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+
+    echo "[INFO] Installing godap: "
+    go install -v github.com/Macmod/godap@latest
+    asdf reshim golang
+}
+
+function install_windapsearch_go() {
+    # temporarily alter PATH(s):
+    export PATH="/opt/tools/bin:$PATH"
+    export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+    
+    echo "[INFO] Installing Go windapsearch: "
+    git -C /opt/tools/ clone --depth 1 https://github.com/magefile/mage
+    cd /opt/tools/mage || exit
+    go run bootstrap.go
+    asdf reshim golang
+    # Install windapsearch tool
+    git -C /opt/tools/ clone --depth 1 https://github.com/ropnop/go-windapsearch
+    cd /opt/tools/go-windapsearch || exit
+    mage build
+    ln -v -s /opt/tools/go-windapsearch/windapsearch /opt/tools/bin/windapsearch
+}
+
+function install_gosecretsdump() {
+    # temporarily alter PATH(s):
+    export PATH="/opt/tools/bin:$PATH"
+    export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+
+    echo "[INFO] Installing gosecretsdump: "
+    go install -v github.com/C-Sto/gosecretsdump@latest
+    asdf reshim golang
+}
+
+function install_kerbrute() {
+    # temporarily alter PATH(s):
+    export PATH="/opt/tools/bin:$PATH"
+    export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+
+    echo "[INFO] Installing Kerbrute: "
+    go install -v github.com/ropnop/kerbrute@latest
+    asdf reshim golang
+}
+
 function install_asrepcatcher() {
     echo "[INFO] Installing Asrepcatcher: "
     uv tool install git+https://github.com/Yaxxine7/ASRepCatcher
@@ -183,7 +303,6 @@ function install_pypykatz() {
       ln -v -s /opt/tools/pypykatz/venv/bin/pypykatz /opt/tools/bin/pypykatz
       deactivate
 }
-
 
 function install_krbjack() {
     echo "[INFO] Installing Krbjack: "
@@ -719,6 +838,7 @@ function post_install() {
     # this could be stupid, but IDC!
     echo -e "export PATH=\"/opt/tools/bin:\$PATH\"\n" >> ~/.bashrc
     echo -e "source ~/.bashrc\n" >> ~/.zshrc
+    echo -e "source \"\$HOME/.cargo/env\"\n" >> ~/.zshrc
 
 }
 
@@ -729,6 +849,17 @@ function main() {
     local end_time
     start_time=$(date +%s)
     install_pipx_uv                 # Install both pipx and UV
+    install_asdf 		    # Better management of languages
+    install_rust_cargo              # Self explanatory
+    install_go                      # Golang with/alongside asdf
+    install_rusthound
+    install_rustscan
+    install_rusthound_ce            # BH-CE collector
+    install_godap                   # A complete terminal user interface (TUI) for LDAP
+    install_goexec                  # Go version of *exec (smb,dcom...) from impacket with stronger OPSEC
+    install_kerbrute                # Tool to enumerate and bruteforce AD accounts through kerberos pre-authentication
+    install_gosecretsdump           # secretsdump in Go for heavy files
+    install_windapsearch_go         # Active Directory Domain enumeration through LDAP queries
     install_asrepcatcher            # Active Directory ASREP roasting tool that catches ASREP for users in the same VLAN whether they require pre-authentication or not
     install_responder               # LLMNR, NBT-NS and MDNS poisoner
     install_ldapdomaindump
@@ -785,15 +916,6 @@ function main() {
     install_goldencopy
     install_crackhound
     install_ldeep
-    # TODO: install_rusthound
-    # TODO: install_rustscan
-    # TODO: install_rusthound_ce           # BH-CE collector
-    # TODO: install_godap                  # A complete terminal user interface (TUI) for LDAP
-    # TODO:install_goexec                 # Go version of *exec (smb,dcom...) from impacket with stronger OPSEC
-    # TODO: install_kerbrute                # Tool to enumerate and bruteforce AD accounts through kerberos pre-authentication
-    # TODO: install_gosecretsdump           # secretsdump in Go for heavy files
-    # TODO: install_windapsearch-go         # Active Directory Domain enumeration through LDAP queries
-    # TODO: install_rusthound-ce
     install_certsync
     install_keepwn
     install_pre2k
