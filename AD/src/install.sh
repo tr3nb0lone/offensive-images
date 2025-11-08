@@ -1,7 +1,7 @@
 #!/bin/bash
 ## Install script for the AD image:
-
-# Setup dest. Dir(s)
+# TODO: fix paths  - add aliases  - 
+# Setup dest. dir(s)
 function setup_dirs() {
 	mkdir -p /opt/tools/ /opt/tools/bin/
 }
@@ -28,8 +28,7 @@ function setup_bin_misc_shell_path() {
     git -C ~/.oh-my-zsh/custom/plugins/ clone --depth 1 https://github.com/zsh-users/zsh-completions
 }
 
-# TODO: Languages: Go-Rust-PowerShell
-# FEAT: asdf - one tool to rule them all 
+# INFO: asdf - one tool to rule them all 
 function install_asdf() {
     echo "[INFO] Installing asdf: "
     local URL
