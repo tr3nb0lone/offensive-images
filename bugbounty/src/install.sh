@@ -1,9 +1,10 @@
 #!/bin/bash
+# Install script for tools related to bugbounty.
 # Inspired by the works of Exegol - please check them out!
 
 function setup_dirs() {
 	# make landing DIR(s) for some tools:
-	mkdir -p /opt/tools/ /opt/tools/bin/
+	mkdir -p /opt/tools/ /opt/tools/bin/ /opt/lists/
 }
 
 function install_go() {
@@ -39,7 +40,7 @@ function install_ohmyzsh() {
 function install_seclists() {
     echo "[INFO] Installing seclists: "
     git -C /opt/lists clone --single-branch --branch master --depth 1 https://github.com/danielmiessler/SecLists.git seclists
-    cd /opt/lists/seclists|| exit
+    cd /opt/lists/seclists || exit
     rm -r LICENSE .git* CONTRIBUT* .bin
     tar -xvf /opt/lists/seclists/Passwords/Leaked-Databases/rockyou.txt.tar.gz -C /opt/lists/
     # helping people to find wordlists in common places

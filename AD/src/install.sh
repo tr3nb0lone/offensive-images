@@ -308,7 +308,7 @@ function install_krbjack() {
     uv tool install krbjack
 }
 
-
+# FIXME: needs python2 to run:
 function install_enyx() {
     echo "[INFO] Installing Enyx: "
     git -C /opt/tools/ clone --depth 1 https://github.com/trickster0/Enyx
@@ -507,6 +507,7 @@ function install_pcredz() {
     deactivate
 }
 
+# FIXME: tool not working
 function install_pywsus() {
     echo "[INFO] Installing PyWSUS: "
     git -C /opt/tools/ clone --depth 1 https://github.com/GoSecure/pywsus
@@ -687,6 +688,7 @@ function install_netexec() {
     register-python-argcomplete nxc >> ~/.bashrc
 }
 
+#FIXME: has issues with installation
 function install_extractbitlockerkeys() {
     echo "[INFO] Installing extractBitLockerKeys: "
     git -C /opt/tools/ clone --depth 1 https://github.com/p0dalirius/ExtractBitlockerKeys
@@ -829,6 +831,18 @@ function install_pysnaffler(){
 function install_evil-winrm-py() {
     echo "[INFO] Installing evil-winrm-py: "
     uv tool install 'evil-winrm-py[kerberos]@git+https://github.com/adityatelange/evil-winrm-py'
+}
+
+function install_winrmexec() {
+    echo "[INFO] Installing winrmexec: "
+    git -C /opt/tools/ clone --depth 1 https://github.com/ozelis/winrmexec.git
+    cd /opt/tools/winrmexec || exit
+
+    uv venv ./venv
+    source ./venv/bin/activate
+    uv pip install --requirements requirements.txt
+    deactivate
+
 }
 
 # post-install:
