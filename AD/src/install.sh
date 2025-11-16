@@ -3,7 +3,7 @@
 # TODO: fix paths  - add aliases  - 
 # Setup dest. dir(s)
 function setup_dirs() {
-	mkdir -p /opt/tools/ /opt/tools/bin/
+	mkdir -p /opt/tools/ /opt/tools/bin/ /root/.config/nvim/ /root/.config/tmux/
 }
 
 # INFO: Installs 78% of the tools!
@@ -842,7 +842,6 @@ function install_winrmexec() {
     source ./venv/bin/activate
     uv pip install --requirements requirements.txt
     deactivate
-
 }
 
 # post-install:
@@ -851,8 +850,19 @@ function post_install() {
     # this could be stupid, but IDC!
     echo -e "export PATH=\"/opt/tools/bin:\$PATH\"\n" >> ~/.bashrc
     echo -e "source ~/.bashrc\n" >> ~/.zshrc
+    echo -e "source /root/assets/aliases\n" >> ~/.zshrc
     echo -e "source \"\$HOME/.cargo/env\"\n" >> ~/.zshrc
 
+    # install TPM:
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+    # assets related to utility software
+    cp /root/assets/init.lua /root/.config/nvim/init.lua
+    cp /root/assets/tmux.conf /root/.config/tmux/tmux.conf
+
+    # Bootstraps both nvim and tmux:
+    tmux new-session -d 'nvim'
+    sleep 200
 }
 
 function main() {
@@ -889,7 +899,7 @@ function main() {
     install_darkarmour              # Windows AV evasion
     install_powershell              # Windows Powershell for Linux
     install_krbrelayx               # Kerberos unconstrained delegation abuse toolkit
-    install_evilwinrm               # WinRM shell
+    install_winrmexec               # Impack-only implementation of WinRM protocol with support for NTLM and Kerberos auth
     install_pypykatz                # Mimikatz implementation in pure Python
     install_krbjack                 # KrbJack
     install_enyx                    # Hosts discovery

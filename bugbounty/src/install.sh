@@ -324,8 +324,18 @@ function post_install() {
     echo -e "export PATH=\"/opt/tools/bin:\$PATH\"\n" >> ~/.bashrc
     echo -e "export PATH=\"/root/.pdtm/go/bin:\$PATH\"\n" >> ~/.bashrc
     echo -e "source ~/.bashrc\n" >> ~/.zshrc
-    chsh -s /bin/zsh
+    # chsh -s /bin/zsh
 
+    # install TPM:
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+    # assets related to utility software
+    cp /root/assets/init.lua /root/.config/nvim/init.lua
+    cp /root/assets/tmux.conf /root/.config/tmux/tmux.conf
+
+    # Bootstraps both nvim and tmux:
+    tmux new-session -d 'nvim'
+    sleep 200
 }
 
 function main() {
