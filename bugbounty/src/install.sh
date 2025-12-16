@@ -4,7 +4,7 @@
 
 function setup_dirs() {
 	# make landing DIR(s) for some tools:
-	mkdir -p /opt/tools/ /opt/tools/bin/ /opt/lists/
+	mkdir -p /opt/tools/ /opt/tools/bin/ /opt/lists/ /root/.config/tmux/ /root/.config/nvim/
 }
 
 function install_go() {
@@ -25,6 +25,14 @@ function install_pipx_uv() {
     pipx install uv
     source ~/.bashrc # makes uv available immediately!
 }
+
+function uv_led_python() {
+	# I'm just experimenting:
+	uv python install 3.11
+	uv python install 3.12
+	uv python install 3.13
+}
+
 function install_ohmyzsh() {
     echo "[INFO] Installing oh-my-zsh: "
     # splitting wget and sh to avoid having additional logs put in curl output being executed because of catch_and_retry
@@ -347,6 +355,7 @@ function main() {
 	setup_dirs
 	install_ohmyzsh
 	install_pipx_uv
+	uv_led_python
 	
 	install_pdtm
 	install_seclists

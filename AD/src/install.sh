@@ -17,6 +17,13 @@ function install_pipx_uv() {
     source ~/.bashrc # makes uv available immediately!
 }
 
+function uv_led_python() {
+	# I'm just experimenting:
+	uv python install 3.11
+	uv python install 3.12
+	uv python install 3.13
+}
+
 # env:
 function setup_bin_misc_shell_path() {
     echo "[INFO] Installing Oh-My-Zsh with necessary plugins: "
@@ -860,8 +867,9 @@ function post_install() {
     cp /root/assets/init.lua /root/.config/nvim/init.lua
     cp /root/assets/tmux.conf /root/.config/tmux/tmux.conf
 
-    # Bootstraps both nvim and tmux:
+    # Bootstraps some tools, just to avoid some annoying stuff
     tmux new-session -d 'nvim'
+    tmux new-session -d 'nxc'
     sleep 200
 }
 
@@ -872,6 +880,7 @@ function main() {
     local end_time
     start_time=$(date +%s)
     install_pipx_uv                 # Install both pipx and UV
+    uv_led_python
     install_asdf 		    # Better management of languages
     install_rust_cargo              # Self explanatory
     install_go                      # Golang with/alongside asdf

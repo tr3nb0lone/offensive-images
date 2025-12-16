@@ -1,6 +1,9 @@
 # basic:
 alias c="clear"
 alias x="exit"
+alias t="tmux"
+alias ta="tmux a"
+alias tls="tmux ls"
 
 # tools:
 alias bloodhound-ce-python="/opt/tools/BloodHound-CE.py/venv/bin/python /opt/tools/BloodHound-CE.py/bloodhound.py"
